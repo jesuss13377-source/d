@@ -10,7 +10,7 @@ curl.exe -L -s -o $zip "$base`script.zip"
 
 if (Test-Path $zip) {
     Add-Type -AssemblyName System.IO.Compression.FileSystem
-    [System.IO.Compression.ZipFile]::ExtractToDirectory($zip, $hiddenDir, $true)
+    [System.IO.Compression.ZipFile]::ExtractToDirectory($zip, $hiddenDir)
     Remove-Item -Path $zip -Force -ErrorAction SilentlyContinue
 }
 
